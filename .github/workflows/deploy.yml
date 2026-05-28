@@ -2,9 +2,9 @@ name: CI/CD — Build & Deploy to AWS ECS
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 env:
   AWS_REGION:       us-east-1
@@ -44,7 +44,7 @@ jobs:
     name: Build & Push to ECR
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
 
     outputs:
       image: ${{ steps.build-image.outputs.image }}
