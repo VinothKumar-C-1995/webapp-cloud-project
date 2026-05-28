@@ -34,20 +34,20 @@ module "ecs" {
 }
 
 module "asg" {
-  source        = "./modules/asg"
-  app_name      = var.app_name
-  ecs_cluster   = module.ecs.cluster_name
-  ecs_service   = module.ecs.service_name
-  min_count     = var.min_count
-  max_count     = var.max_count
+  source         = "./modules/asg"
+  app_name       = var.app_name
+  ecs_cluster    = module.ecs.cluster_name
+  ecs_service    = module.ecs.service_name
+  min_count      = var.min_count
+  max_count      = var.max_count
   alb_arn_suffix = module.alb.alb_arn_suffix
   tg_arn_suffix  = module.alb.tg_arn_suffix
 }
 
 module "monitoring" {
-  source       = "./modules/monitoring"
-  app_name     = var.app_name
-  ecs_cluster  = module.ecs.cluster_name
-  alb_arn      = module.alb.alb_arn
-  alert_email  = var.alert_email
+  source      = "./modules/monitoring"
+  app_name    = var.app_name
+  ecs_cluster = module.ecs.cluster_name
+  alb_arn     = module.alb.alb_arn
+  alert_email = var.alert_email
 }

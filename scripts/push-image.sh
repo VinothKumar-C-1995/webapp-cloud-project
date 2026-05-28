@@ -3,7 +3,7 @@ set -e
 
 REGION="us-east-1"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-ECR_URL="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
+ECR_URL="236280552057.dkr.ecr.$REGION.amazonaws.com"
 REPO="webapp"
 TAG="${1:-latest}"
 
