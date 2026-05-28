@@ -1,0 +1,9 @@
+aws_region    = "us-east-1"
+environment   = "prod"
+app_name      = "webapp"
+vpc_cidr      = "10.0.0.0/16"
+desired_count = 2
+min_count     = 1
+max_count     = 6
+container_port = 3000
+alert_email   = "your-email@example.com"   # change this
