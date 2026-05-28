@@ -80,42 +80,53 @@ jobs:
   # Job 3: Deploy to ECS
   # ────────────────────────────────────────────────────────
   deploy:
+
     name: Deploy to ECS
+
     needs: build
+
     runs-on: ubuntu-latest
 
+    if: github.ref == 'refs/heads/master'
+
     steps:
+
       - uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
+
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Download current task definition
+      - name: Force ECS Deployment
+
         run: |
-          aws ecs describe-task-definition \
-            --task-definition ${{ env.ECS_CLUSTER }}-task \
-            --query taskDefinition > task-definition.json
 
-      - name: Render new task definition with updated image
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name:  ${{ env.CONTAINER_NAME }}
-          image:           ${{ needs.build.outputs.image }}
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --force-new-deployment
 
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition:          ${{ steps.task-def.outputs.task-definition }}
-          service:                  ${{ env.ECS_SERVICE }}
-          cluster:                  ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+      - name: Wait for ECS Stability
 
+        run: |
+
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }}
+
+      - name: Deployment summary
+
+        run: |
+
+          echo "Deployment completed successfully"
+
+          echo "Deployed image:"
+          echo "${{ needs.build.outputs.image }}"
+          
       - name: Deployment summary
         run: |
           echo "✅ Deployed image: ${{ needs.build.outputs.image }}"
